@@ -1,5 +1,6 @@
 package game;
 
+import Interfaz.KSPanelInfo;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -10,9 +11,16 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private int panelWidth;
     private int panelHeight;
 
-    public GamePanel(int width, int height) {
+    private int puntos = 0;
+    private int vidas = 3;
+    private int maxPuntos = 0;
+
+    private KSPanelInfo panelInfo;
+
+    public GamePanel(int width, int height, KSPanelInfo panelInfo) {
         this.panelWidth = width;
         this.panelHeight = height;
+        this.panelInfo = panelInfo;
 
         setPreferredSize(new Dimension(panelWidth, panelHeight));
         setBackground(Color.BLACK);
@@ -37,6 +45,35 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     public void actionPerformed(ActionEvent e) {
         nave.actualizar();
         repaint();
+    }
+
+    // Métodos públicos para que otros componentes (por ejemplo, meteoritos) puedan llamar
+
+    public void sumarPuntos(int cantidad) {
+        puntos += cantidad;
+        if (puntos > maxPuntos) maxPuntos = puntos;
+        actualizarInterfaz();
+    }
+
+    public void perderVida() {
+        vidas--;
+        if (vidas <= 0) {
+            vidas = 0;
+            gameOver();
+        }
+        actualizarInterfaz();
+    }
+
+    private void actualizarInterfaz() {
+        panelInfo.setPuntos(puntos);
+        panelInfo.setVidas(vidas);
+        panelInfo.setMaxPuntos(maxPuntos);
+    }
+
+    private void gameOver() {
+        timer.stop();
+        JOptionPane.showMessageDialog(this, "¡Juego terminado!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+        // Aquí puedes agregar un menú o reiniciar el juego si quieres
     }
 
     @Override

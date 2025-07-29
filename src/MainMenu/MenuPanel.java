@@ -1,61 +1,92 @@
 package MainMenu;
-import game.*;
 
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import database.RankingDB;
+
 import java.awt.*;
-import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 import java.io.File;
 import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class MenuPanel extends JPanel {
-    public MenuPanel(GameController launcher) {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBackground(Color.DARK_GRAY);
+    private List<JButton> botones = new ArrayList<>();
+    private int seleccionado = 0;
+    private BufferedImage fondo;
 
-        JButton startButton = new JButton("Iniciar Juego");
-        JButton exitButton = new JButton("Salir");
-        Color colorStartButton = new Color(144, 238, 178);
-        Color colorExitButton = new Color(	255, 166, 125);
+    public MenuPanel(game.GameController controller) {
+        setLayout(null); // Usamos posicionamiento manual
+        setFocusable(true);
 
-        startButton.setBackground(colorStartButton);
-        exitButton.setBackground(colorExitButton);
+        try {
+            fondo = ImageIO.read(new File("Sprites/MenuBackGround.png"));
+        } catch (IOException e) {
+            System.out.println("No se pudo cargar la imagen del fondo del menú.");
+        }
 
-        startButton.setBorderPainted(false);
-        exitButton.setBorderPainted(false);
+        // Crear botones
+        JButton jugarBtn = crearBoton("Jugar", () -> controller.mostrarGamePanel());
+        JButton rankingBtn = crearBoton("Ranking", () -> controller.mostrarRanking());
+        JButton creditosBtn = crearBoton("Créditos", () -> controller.mostrarCreditos());
 
-        startButton.setAlignmentX(Component.BOTTOM_ALIGNMENT);
-        exitButton.setAlignmentX(Component.BOTTOM_ALIGNMENT);
+        JButton salirBtn = crearBoton("Salir", () -> System.exit(0));
 
-        startButton.setFont(new Font("Arial", Font.BOLD, 20));
-        exitButton.setFont(new Font("Arial", Font.BOLD, 20));
+        botones.add(jugarBtn);
+        botones.add(rankingBtn);
+        botones.add(creditosBtn);
+        botones.add(salirBtn);
 
-        startButton.addActionListener((ActionEvent e) -> {
-            launcher.mostrarGamePanel(); // Llama al método que cambia de panel
-        });
+        // Posicionar botones en la parte izquierda
+        int x = 60;
+        int y = 100;
+        int width = 180;
+        int height = 40;
+        int separacion = 20;
 
-        exitButton.addActionListener((ActionEvent e) -> {
-            System.exit(0);
-        });
+        for (JButton b : botones) {
+            b.setBounds(x, y, width, height);
+            add(b);
+            y += height + separacion;
+        }
 
-        add(Box.createVerticalGlue());
-        add(startButton);
-        add(Box.createRigidArea(new Dimension(0, 20)));
-        add(exitButton);
-        add(Box.createVerticalGlue());
+        actualizarSeleccionVisual();
+    }
+
+    private JButton crearBoton(String texto, Runnable accion) {
+        JButton btn = new JButton(texto);
+        btn.setFocusable(false);
+        btn.setFont(new Font("Arial", Font.PLAIN, 16));
+        btn.setBackground(Color.DARK_GRAY);
+        btn.setForeground(Color.BLUE);
+        btn.addActionListener(e -> accion.run());
+        return btn;
+    }
+
+    private void actualizarSeleccionVisual() {
+        for (int i = 0; i < botones.size(); i++) {
+            botones.get(i).setBackground(i == seleccionado ? Color.yellow : Color.DARK_GRAY);
+        }
+    }
+
+    public void moverSeleccion(int direccion) {
+        seleccionado += direccion;
+        if (seleccionado < 0) seleccionado = botones.size() - 1;
+        if (seleccionado >= botones.size()) seleccionado = 0;
+        actualizarSeleccionVisual();
+    }
+
+    public void activarSeleccion() {
+        botones.get(seleccionado).doClick();
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-    super.paintComponent(g);
-    try {
-        BufferedImage bg = ImageIO.read(new File("Sprites/BackGround.png"));
-        g.drawImage(bg, 0, 0, getWidth(), getHeight(), null);
-    } catch (IOException e) {
-        g.setColor(Color.DARK_GRAY); // Fallback color
-        g.fillRect(0, 0, getWidth(), getHeight());
+        super.paintComponent(g);
+        if (fondo != null) {
+            g.drawImage(fondo, 0, 0, getWidth(), getHeight(), null);
+        }
     }
-}
-
 }

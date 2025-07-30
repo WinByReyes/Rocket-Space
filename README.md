@@ -1,144 +1,75 @@
-# 🚀 Proyecto Java - Juego de Navecita (Versión Base con Movimiento WASD)
+[Dilan Rodriguez] Dilan-R
+# Documentación del Sistema de Vidas y Puntuación
 
-## 🎯 Objetivo
+Este documento explica la funcionalidad y estructura de cada parte del sistema de **vidas y puntuación** dentro del proyecto del videojuego Rocket Space.
 
-Desarrollar un juego básico en Java donde una nave espacial puede moverse libremente dentro de una ventana utilizando un **sprite personalizado**, es solo el comienzo para nuestro proycto final.
+## 📦 Paquetes y Clases
 
----
+### `core.PlayerStats` (Interfaz)
+Define los métodos esenciales para el control de vidas y puntuación.
 
-## 📁 Estructura del Proyecto
-
-Rockect Space/
-
-├── Sprites/
-
-│ └── ShipSprite.png
-
-├── src/
-
-│ └── game/
-
-│ ├── GameController.java
-
-│ ├── GamePanel.java
-
-│ └── Nave.java
-
-├── App.java
+#### Métodos:
+- `int getLives()` - Devuelve el número actual de vidas.
+- `void loseLife()` - Disminuye una vida (si hay al menos una).
+- `void addLife()` - Añade una vida.
+- `int getScore()` - Devuelve el puntaje actual.
+- `void addScore(int value)` - Incrementa el puntaje en una cantidad específica.
+- `void reset()` - Reinicia las vidas y el puntaje.
 
 ---
 
-- `src/game/`: contiene toda la lógica del juego.
-- `Sprites/`: contiene el sprite de la nave cargado dinámicamente.
+### `core.PlayerStatsImpl` (Implementación)
+Implementa la interfaz `PlayerStats`. Lleva un registro interno de las vidas y puntuación del jugador.
+
+#### Atributos:
+- `int lives` - Representa las vidas restantes del jugador.
+- `int score` - Representa el puntaje acumulado.
+
+#### Constructor:
+- `PlayerStatsImpl(int initialLives)` - Inicializa el sistema con un número determinado de vidas.
+
+#### Lógica:
+- Cada vez que el jugador pierde una vida, `lives--` si es mayor que 0.
+- Cada vez que el jugador gana puntos, `score += value`.
+- El método `reset()` vuelve a poner las vidas en 3 y el puntaje en 0 (puede ajustarse).
 
 ---
 
-## 🧱 Componentes del Proyecto
+### `ui.HUD`
+Componente de interfaz gráfica que muestra la información al jugador (vidas y puntaje).
 
-### ✅ `App.java`
+#### Atributos:
+- `PlayerStats stats` - Instancia de estadísticas del jugador.
 
-- Punto de entrada del programa.
-- Mantiene solo la llamada a la clase `GameController` para delegar la inicialización.
-- Esto mantiene el archivo limpio y enfocado.
-
-### ✅ `GameController.java`
-
-- Se encarga de crear la ventana (`JFrame`) del juego.
-- Define el tamaño fijo (800x600) y el título.
-- Agrega el `GamePanel` al frame.
-- Inicia el juego llamando a `startGame()` del panel.
-
-### ✅ `GamePanel.java`
-
-
-- Es el panel principal del juego (`JPanel`) donde se dibujan los objetos y se ejecuta la lógica de actualización.
-- Tiene un `Timer` para generar el ciclo de juego (aproximadamente 60 FPS).
-- Maneja entrada por teclado y redibuja la pantalla.
-- Contiene una instancia de `Nave`.
-
-### ✅ `Nave.java`
-
-- Representa la nave espacial.
-- Soporta movimiento en las 4 direcciones usando teclas **W**, **A**, **S**, **D**. (Proximamente que las cambiaremos a los movimientos del mando, solo es de uso temporal)
-- La nave no puede salirse del área visible del panel.
-- Carga un sprite desde `Sprites/ShipSprite.png` para mostrar la imagen de la nave.
-- Si la imagen no se encuentra o hay error, dibuja un rectángulo como respaldo.
-- Las teclas son manejadas con `KeyEvent.VK_W`, etc., y los estados se actualizan por `keyPressed` y `keyReleased`.
-
-## 🧠 Consideraciones Técnicas
-
-- El sprite se carga con `ImageIO.read(new File(...))`, por lo que **debes ejecutar el programa desde la raíz del proyecto** para que funcione correctamente.
-- Los límites del movimiento se controlan en `Nave.java` usando las dimensiones del panel.
-- El `Timer` en `GamePanel` actualiza la lógica del juego cada ~16 ms.
-- `GamePanel` y `Nave` están desacoplados para que se pueda extender fácilmente (por ejemplo, disparos, enemigos, colisiones, etc.).
+#### Métodos:
+- `void draw(Graphics g)` - Muestra el número de vidas y puntaje actual en la pantalla con estilo personalizado.
 
 ---
 
-## Explicaciones del codigo
+### `controller.StatsController`
+Controlador lógico del sistema. Encapsula la lógica del juego que modifica vidas y puntuación.
 
-**Darwin Reyes**
+#### Atributos:
+- `PlayerStats stats` - Referencia a la implementación del sistema de estadísticas.
 
-### 📄 GamePanel.java
-
-``` Java
-setPreferredSize(new Dimension(width,height));
-setBackground(Color.BLACK);
-addKeyListener(this);
-```
-- Configura el tamaño y el color de fondo del panel.
-- También activa la detección de teclado (Proximamente para cambiar por el mando).
-
-``` Java
-Timer timer = new Timer(16, this);
-```
-- Inicia un "bucle de juego" que se ejecuta ~60 veces por segundo.
-- Cada 16 ms, se actualiza la lógica y se repinta la pantalla.
-
-## 📄 Nave.java
-
-``` Java
-BufferedImage sprite = ImageIO.read(new File("Sprites/ShipSprite.png"));
-```
-- Carga la imagen de la nave desde una carpeta externa llamada 'Sprites'.
-- Si no se encuentra o falla, se usará un dibujo básico como respaldo.
-
-``` Java
-if (izquierda && x > 0) x -= velocidad;
-if (derecha && x + ancho < limiteAncho) x += velocidad;
-if (arriba && y > 0) y -= velocidad;
-if (abajo && y + alto < limiteAlto) y += velocidad;
-```
-- Lógica de movimiento de la nave.
-- Se asegura de que la nave no salga de los bordes del panel.
-  
-``` Java
-public void dibujar(Graphics g) {
-    g.drawImage(sprite, x, y, ancho, alto, null);
-}
-```
-- Dibuja el sprite en la posición actual de la nave.
-
-## Resumen - Darwin Reyes
-
- - Nave tiene posición, velocidad, sprite y dirección de movimiento.
- - GamePanel tiene un Timer que actualiza el juego constantemente.
- - GameLauncher crea la ventana y lanza el panel.
- - Main mantiene limpio el arranque del juego.
+#### Métodos:
+- `void playerHit()` - El jugador pierde una vida.
+- `void collectScore(int value)` - El jugador gana una cierta cantidad de puntos.
+- `void gainLife()` - El jugador gana una vida.
+- `void resetStats()` - Se reinicia el sistema.
+- `int getCurrentLives()` / `getCurrentScore()` - Devuelven valores actuales.
 
 ---
-Para usar 
-``` Java
 
-```
+### `main.GameScreen` (Integración)
+Ejemplo de panel de juego que usa Swing para pintar el HUD en pantalla y simula eventos del juego.
 
-``` Java
+#### Atributos:
+- `StatsController controller` - Controlador del sistema.
+- `HUD hud` - Elemento visual para mostrar vidas y puntuación.
 
-```
+#### Métodos:
+- `paintComponent(Graphics g)` - Dibuja el HUD.
+- `simulateGameplay()` - Simula una ronda de juego: suma puntos y resta una vida.
 
-``` Java
-
-```
-
-``` Java
-
-```
+---

@@ -28,8 +28,8 @@ public class Meteorito {
         // Aparecen arriba (fuera de la pantalla)
         this.y = -alto;
 
-        // Velocidad aleatoria entre 2 y 6 píxeles por frame (ajustable)
-        this.velocidad = 2 + random.nextInt(5);
+        // Velocidad aleatoria entre 3 y 7(suma 1 al bound) píxeles por frame (ajustable)
+        this.velocidad = 3 + random.nextInt(6);
 
         try {
             imagen = ImageIO.read(new File("Sprites/Meteorito.png"));

@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import util.SoundPlayer;
 
 public class Nave {
     private int x, y;
@@ -20,6 +21,7 @@ public class Nave {
     private BufferedImage sprite;
     private long tiempoUltimoDisparo = 0;
     private final int cooldownDisparo = 300; // milisegundos entre disparos (0.3 segundos
+    private SoundPlayer disparoSonido = new SoundPlayer("disparo.wav", false);
 
     private List<Disparo> disparos = new ArrayList<>();
 
@@ -82,6 +84,7 @@ public class Nave {
 
     private void disparar() {
         long ahora = System.currentTimeMillis();
+        disparoSonido.playOnce();
     if (ahora - tiempoUltimoDisparo >= cooldownDisparo) {
         tiempoUltimoDisparo = ahora;
 

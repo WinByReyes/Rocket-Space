@@ -1,3 +1,7 @@
-# Ignorar base de datos
+# Archivos de base de datos
 *.db
 *.sqlite
+
+# ignorar vscode
+.vscode/
+
